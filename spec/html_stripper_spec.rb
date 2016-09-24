@@ -14,6 +14,10 @@ describe HtmlStripper do
   let(:default_stripper) { HtmlStripper.new }
 
   context '#run' do
+    it 'accepts empty string' do
+      expect(default_stripper.run('')).to eq('')
+    end
+
     context '(with default setting)' do
       default_tests = [
         {
@@ -56,6 +60,54 @@ describe HtmlStripper do
             .to eq(test[:expected] || test[:source])
         end
       end
+    end
+
+    context '(with options)' do
+      it 'can disable comment remove' do
+        src = '<!-- hoge --><foo>   </foo>'
+        expected = '<!-- hoge --><foo> </foo>'
+        expect(HtmlStripper.new(strip_comments: false).run(src))
+          .to eq expected
+      end
+
+      it 'can disable trimming of new lines' do
+        src = "<foo>\n\n\n</foo>"
+        expect(HtmlStripper.new(simplify_lines: false).run(src))
+          .to eq src
+      end
+
+      it 'can disable minifying spaces' do
+        src = "<foo>  \t  </foo>"
+        expect(HtmlStripper.new(minify_spaces: false).run(src))
+          .to eq src
+      end
+
+      it 'can set keeping tags' do
+        src = '<foo>   </foo><textarea><!--  --></textarea>'
+        expected = '<foo>   </foo><textarea></textarea>'
+        expect(HtmlStripper.new(keep_tags: %i(foo)).run(src))
+          .to eq expected
+      end
+
+      it 'can set keeping patterns' do
+        src = '<?php    ?><foo>    </foo>'
+        expected = '<?php    ?><foo> </foo>'
+        expect(HtmlStripper.new(keep_patterns: [%w(<?php ?>)]).run(src))
+          .to eq expected
+      end
+    end
+  end
+
+  context '.run' do
+    it 'can run without options' do
+      src = "<test>  \n \n </test><test2>\n\n</test2>"
+      expected = "<test>\n</test><test2>\n</test2>"
+      expect(HtmlStripper.run(src)).to eq expected
+    end
+
+    it 'can run with options' do
+      src = "<test> \n \n </test><test2>\n\n</test2>"
+      expect(HtmlStripper.run(src, simplify_lines: false)).to eq src
     end
   end
 end

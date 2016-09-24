@@ -48,6 +48,13 @@ class HtmlStripper
     splitted.map { |frag| process_fragment frag }.join
   end
 
+  # strip from specified HTML.
+  # @param [String] html input HTML.
+  # @param [Hash] opts the options for stripping (same for .new).
+  def self.run(html, opts = {})
+    new(opts).run(html)
+  end
+
   private
 
   def process_fragment(html)
