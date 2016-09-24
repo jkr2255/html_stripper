@@ -1,3 +1,3 @@
-module HtmlStripper
-  VERSION = "0.1.0"
+class HtmlStripper
+  VERSION = '0.1.0'.freeze
 end
