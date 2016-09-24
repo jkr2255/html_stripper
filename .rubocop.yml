@@ -2,4 +2,4 @@ Style/LineLength:
   Max: 100
 
 AllCops:
-  TargetRubyVersion: 1.9
+  TargetRubyVersion: 2.0
