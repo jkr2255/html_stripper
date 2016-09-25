@@ -13,6 +13,7 @@ class HtmlStripper
     strip_comments: true,
     simplify_lines: true,
     minify_spaces: true,
+    minify_spaces_inside_tags: true,
     keep_tags: [:script, :style, :textarea, :pre].freeze,
     keep_patterns: [CDATA_REGEXES, COND_COMMENT_REGEXES].freeze
   }.freeze
@@ -53,7 +54,8 @@ class HtmlStripper
   SUBSTITUTIONS = {
     strip_comments: [COMMENT_REGEX, ''],
     simplify_lines: [NEWLINE_REGEX, "\n"],
-    minify_spaces: [SPACES_REGEX, ' ']
+    minify_spaces: [SPACES_REGEX, ' '],
+    minify_spaces_inside_tags: [INSIDE_TAG_SPACES_REGEX, ' ']
   }.freeze
 
   def process_fragment(html)

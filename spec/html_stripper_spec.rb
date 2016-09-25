@@ -40,8 +40,9 @@ describe HtmlStripper do
           source: "<foo bar='  \n\n\t\n baz'>"
         },
         {
-          title: "doesn't change continuous spaces inside tags",
-          source: '<test  attr1=" val "  ><test2   /> </test>'
+          title: 'simplifies continuous spaces and newlines inside tags',
+          source: "<test \n\t attr1=\"val\"  ><test2 foo    bar=\"baz\"  /> </test>",
+          expected: '<test attr1="val" ><test2 foo bar="baz" /> </test>'
         },
         {
           title: 'keeps anything inside style, script, textarea, pre tags',
