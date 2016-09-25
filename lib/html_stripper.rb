@@ -2,16 +2,16 @@ require 'html_stripper/version'
 
 # Main class for HtmlStripper.
 class HtmlStripper
-  CDATA_PATTERNS = %w(<![CDATA[ ]]>).freeze
+  CDATA_REGEXES = [/<!\[CDATA\[/i, /\]\]>/].freeze
 
-  COND_COMMENT_PATTERNS = [/<!--<!\[|<!--\[/, ']-->'].freeze
+  COND_COMMENT_REGEXES = [/<!--<!\[|<!--\[/, /\]-->/].freeze
 
   DEFAULT_OPTIONS = {
     strip_comments: true,
     simplify_lines: true,
     minify_spaces: true,
     keep_tags: [:script, :style, :textarea, :pre].freeze,
-    keep_patterns: [CDATA_PATTERNS, COND_COMMENT_PATTERNS].freeze
+    keep_patterns: [CDATA_REGEXES, COND_COMMENT_REGEXES].freeze
   }.freeze
 
   # Generates HtmlStripper.
@@ -55,15 +55,16 @@ class HtmlStripper
     html
   end
 
-  def build_tag_patterns
-    @tag_patterns = @options[:keep_tags].map do |sym|
-      ["<#{sym}#{TAGNAME_END_PATTERN}", "</#{sym}>"]
+  def build_tag_regexes
+    @tag_regexes = @options[:keep_tags].map do |sym|
+      escaped = Regexp.escape sym.to_s
+      [/<#{escaped}#{TAGNAME_END_REGEX}/i, %r{</#{escaped}>}i]
     end
   end
 
   def build_regexes
-    build_tag_patterns
-    patterns = @tag_patterns + @options[:keep_patterns]
+    build_tag_regexes
+    patterns = @tag_regexes + @options[:keep_patterns]
     if patterns.empty?
       @exclude_head_regex = @split_regex = NO_HIT_REGEX
       return
