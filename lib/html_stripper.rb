@@ -14,16 +14,6 @@ class HtmlStripper
     keep_patterns: [CDATA_PATTERNS, COND_COMMENT_PATTERNS].freeze
   }.freeze
 
-  TAGNAME_END_PATTERN = '[\s/>]'.freeze
-
-  NO_HIT_REGEX = /(?!)/
-
-  NEWLINE_REGEX = /\s*\n\s+/
-
-  SPACES_REGEX = /[ \t]{2,}(?=[^> \t]*<|\z)/
-
-  COMMENT_REGEX = /<!--.*?-->/m
-
   # Generates HtmlStripper.
   # @param  [Hash] opts the options for stripping.
   # @option opts [true, false] :strip_comments
@@ -84,3 +74,5 @@ class HtmlStripper
       /#{patterns.map { |item| "(#{item[0]}.*?#{item[1]})" }.join('|')}/mi
   end
 end
+
+require 'html_stripper/private_constants'
