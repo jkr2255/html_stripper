@@ -13,7 +13,7 @@ class HtmlStripper # :nodoc:
 
     # from HTML5 specification 8.1.2.3
     ATTRIBUTE_NAME_REGEX = %r{(?>[^\x00'">/= \t\r\n\f]+)}
-    UNQUOTED_VALUE_REGEX = %r{(?>[ \t\r\n\f"'=<>`]+)}
+    UNQUOTED_VALUE_REGEX = /(?>[ \t\r\n\f"'=<>`]+)/
     QUOTED_VALUE_REGEX = /'.*?'|".*?"/m
 
     NEWLINE_REGEX = /#{SPACE_CHARACTER_REGEX}*[\r\n\f]#{SPACE_CHARACTER_REGEX}+/
