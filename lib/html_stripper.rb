@@ -2,6 +2,9 @@ require 'html_stripper/version'
 
 # Main class for HtmlStripper.
 class HtmlStripper
+  # load after class was created, before using constants
+  require 'html_stripper/private_constants'
+
   CDATA_REGEXES = [/<!\[CDATA\[/i, /\]\]>/].freeze
 
   COND_COMMENT_REGEXES = [/<!--<!\[|<!--\[/, /\]-->/].freeze
@@ -47,11 +50,17 @@ class HtmlStripper
 
   private
 
+  SUBSTITUTIONS = {
+    strip_comments: [COMMENT_REGEX, ''],
+    simplify_lines: [NEWLINE_REGEX, "\n"],
+    minify_spaces: [SPACES_REGEX, ' ']
+  }.freeze
+
   def process_fragment(html)
     return html if html =~ @exclude_head_regex
-    html = html.gsub(COMMENT_REGEX, '') if @options[:strip_comments]
-    html = html.gsub(NEWLINE_REGEX, "\n") if @options[:simplify_lines]
-    html = html.gsub(SPACES_REGEX, ' ') if @options[:minify_spaces]
+    SUBSTITUTIONS.each do |key, (pattern, sub)|
+      html = html.gsub(pattern, sub) if @options[key]
+    end
     html
   end
 
@@ -75,5 +84,3 @@ class HtmlStripper
       /#{patterns.map { |item| "(#{item[0]}.*?#{item[1]})" }.join('|')}/mi
   end
 end
-
-require 'html_stripper/private_constants'
