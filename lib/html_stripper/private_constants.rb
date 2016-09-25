@@ -9,16 +9,18 @@ class HtmlStripper # :nodoc:
     NO_HIT_REGEX = /(?!)/
 
     # from HTML5 specification 2.4.1
-    SPACE_CHARACTER_REGEX = /[ \t\r\n\f]/
+    SPACE_CHARACTER = /[ \t\r\n\f]/
 
     # from HTML5 specification 8.1.2.3
     ATTRIBUTE_NAME_REGEX = %r{(?>[^\x00'">/= \t\r\n\f]+)}
     UNQUOTED_VALUE_REGEX = /(?>[ \t\r\n\f"'=<>`]+)/
     QUOTED_VALUE_REGEX = /'.*?'|".*?"/m
 
-    NEWLINE_REGEX = /#{SPACE_CHARACTER_REGEX}*[\r\n\f]#{SPACE_CHARACTER_REGEX}+/
+    OUTSIDE_TAG = /(?=[^><]*+(?:<|\z))/m
 
-    SPACES_REGEX = /(?>[ \t]{2,})(?=[^><]*+(?:<|\z))/
+    NEWLINE_REGEX = /#{SPACE_CHARACTER}*[\r\n\f]#{SPACE_CHARACTER}+#{OUTSIDE_TAG}/
+
+    SPACES_REGEX = /(?>[ \t]{2,})#{OUTSIDE_TAG}/
 
     private_constant(*constants(false))
   end

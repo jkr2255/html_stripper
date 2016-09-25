@@ -36,6 +36,10 @@ describe HtmlStripper do
           expected: '<test> <test2> </test2></test>'
         },
         {
+          title: 'keeps continuous spaces and newlines inside attribute values',
+          source: "<foo bar='  \n\n\t\n baz'>"
+        },
+        {
           title: "doesn't change continuous spaces inside tags",
           source: '<test  attr1=" val "  ><test2   /> </test>'
         },
