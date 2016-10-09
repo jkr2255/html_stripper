@@ -25,8 +25,9 @@ class HtmlStripper
     private
 
     def initialize_inter_tags
-      @inter_tags =
-        @keep_patterns.map.with_index { |regex, i| [:"keep_#{i}", [regex, nil]] }.to_h
+      @inter_tags = Hash[
+        @keep_patterns.map.with_index { |regex, i| [:"keep_#{i}", [regex, nil]] }
+      ]
       @inter_tags.merge!(Marshal.load(Marshal.dump(DEFAULT_INTER_TAGS)))
       INTER_TAG_OPTIONS.each do |option_key, (table_key, val)|
         next unless @options[option_key]
