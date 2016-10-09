@@ -1,22 +1,23 @@
 require 'html_stripper/version'
+require 'html_stripper/private_constants'
+require 'html_stripper/inter_tag'
+require 'html_stripper/inside_tag'
+require 'strscan'
 
 # Main class for HtmlStripper.
 class HtmlStripper
-  # load after class was created, before using constants
-  require 'html_stripper/private_constants'
-
   CDATA_REGEXES = [/<!\[CDATA\[/i, /\]\]>/].freeze
 
   COND_COMMENT_REGEXES = [/<!--<!\[|<!--\[/, /\]-->/].freeze
 
-  DEFAULT_OPTIONS = {
+  DEFAULT_OPTIONS = IceNine.deep_freeze(
     strip_comments: true,
     simplify_lines: true,
     minify_spaces: true,
     minify_spaces_inside_tags: true,
-    keep_tags: [:script, :style, :textarea, :pre].freeze,
-    keep_patterns: [CDATA_REGEXES, COND_COMMENT_REGEXES].freeze
-  }.freeze
+    keep_tags: [:script, :style, :textarea, :pre],
+    keep_patterns: [CDATA_REGEXES, COND_COMMENT_REGEXES]
+  )
 
   # Generates HtmlStripper.
   # @param  [Hash] opts the options for stripping.
@@ -32,14 +33,15 @@ class HtmlStripper
       end
     end
     build_regexes
+    initialize_tables
   end
 
   # strip from specified HTML.
   # @param [String] html input HTML.
   # @return [String] return stripped HTML.
   def run(html)
-    splitted = html.split @split_regex
-    splitted.map { |frag| process_fragment frag }.join
+    @scanner = StringScanner.new(html)
+    inter_tag
   end
 
   # strip from specified HTML.
@@ -51,19 +53,12 @@ class HtmlStripper
 
   private
 
-  SUBSTITUTIONS = {
-    strip_comments: [COMMENT_REGEX, ''],
-    simplify_lines: [NEWLINE_REGEX, "\n"],
-    minify_spaces: [SPACES_REGEX, ' '],
-    minify_spaces_inside_tags: [INSIDE_TAG_SPACES_REGEX, ' ']
-  }.freeze
+  include InterTag
+  include InsideTag
 
-  def process_fragment(html)
-    return html if html =~ @exclude_head_regex
-    SUBSTITUTIONS.each do |key, (pattern, sub)|
-      html = html.gsub(pattern, sub) if @options[key]
-    end
-    html
+  def initialize_tables
+    initialize_inter_tags
+    initialize_inside_tag
   end
 
   def build_tag_regexes
@@ -76,13 +71,6 @@ class HtmlStripper
   def build_regexes
     build_tag_regexes
     patterns = @tag_regexes + @options[:keep_patterns]
-    if patterns.empty?
-      @exclude_head_regex = @split_regex = NO_HIT_REGEX
-      return
-    end
-    @exclude_head_regex =
-      /\A#{patterns.map { |item| item[0] }.join('|')}/mi
-    @split_regex =
-      /#{patterns.map { |item| "(#{item[0]}.*?#{item[1]})" }.join('|')}/mi
+    @keep_patterns = patterns.map { |item| /#{item[0]}.*?#{item[1]}/mi }
   end
 end

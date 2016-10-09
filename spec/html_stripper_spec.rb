@@ -42,7 +42,7 @@ describe HtmlStripper do
         {
           title: 'simplifies continuous spaces and newlines inside tags',
           source: "<test \n\t attr1=\"val\"  ><test2 foo    bar=\"baz\"  /> </test>",
-          expected: '<test attr1="val" ><test2 foo bar="baz" /> </test>'
+          expected: "<test\nattr1=\"val\" ><test2 foo bar=\"baz\" /> </test>"
         },
         {
           title: 'keeps anything inside style, script, textarea, pre tags',
